@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Northwind.DbModels.Model
 {
-    public partial class NorthwindContext : DbContext
+    public partial class NorthwindContext : DbContext, INorthwindContext
     {
         public NorthwindContext()
         {
