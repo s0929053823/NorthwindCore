@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Northwind.DbModels.Model
 {
-    public partial class CustomerDemographics
+    public partial class CustomerDemographics : Entity
     {
         public CustomerDemographics()
         {
