@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Northwind.DbModels.Model
 {
-    public partial class Orders
+    public partial class Orders : Entity
     {
         public Orders()
         {
@@ -28,6 +28,7 @@ namespace Northwind.DbModels.Model
         public virtual Customers Customer { get; set; }
         public virtual Employees Employee { get; set; }
         public virtual Shippers ShipViaNavigation { get; set; }
-        public virtual ICollection<OrderDetails> OrderDetails { get; set; }
+        //Set is private , so it can't be reintialize
+        public virtual ICollection<OrderDetails> OrderDetails { get; private set; }
     }
 }

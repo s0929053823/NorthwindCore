@@ -1,0 +1,1 @@
+﻿dotnet ef dbcontext scaffold "Server=(localdb)\MSSQLLocalDB;AttachDbFileName=D:\Code\CSharp\NorthwindCore\NorthwindDatabase\AppData\Northwind.MDF;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -o Model -c "NorthwindContext"
