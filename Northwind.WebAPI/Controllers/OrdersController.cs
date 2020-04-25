@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Northwind.DbModels.Model;
+using Northwind.WebAPI.Repositorys;
 
 namespace Northwind.WebAPI.Controllers
 {
@@ -13,25 +14,26 @@ namespace Northwind.WebAPI.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly NorthwindContext _context;
+        private readonly IRepository<Orders> _orderRepository;
 
-        public OrdersController(NorthwindContext context)
+        public OrdersController(IRepository<Orders> orderRepository)
         {
-            _context = context;
+            _orderRepository = orderRepository;
         }
 
         // GET: api/Orders
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Orders>>> GetOrders()
+        public async Task<IEnumerable<Orders>> GetOrders()
         {
-            return await _context.Orders.ToListAsync();
+            return await _orderRepository.GetAllAsync();
         }
+
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Orders>> GetOrders(int id)
         {
-            var orders = await _context.Orders.FindAsync(id);
+            var orders = await _orderRepository.FindAsync(id);
 
             if (orders == null)
             {
@@ -41,31 +43,22 @@ namespace Northwind.WebAPI.Controllers
             return orders;
         }
 
-        // PUT: api/Orders/5
+        //PUT: api/Orders/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrders(int id, Orders orders)
+        public async Task<IActionResult> PutOrders(int id, [FromBody]Orders orders)
         {
             if (id != orders.OrderId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(orders).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _orderRepository.UpdateAsync(orders);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!OrdersExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -75,9 +68,7 @@ namespace Northwind.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Orders>> PostOrders(Orders orders)
         {
-            _context.Orders.Add(orders);
-            await _context.SaveChangesAsync();
-
+            await _orderRepository.InsertAsync(orders);
             return CreatedAtAction("GetOrders", new { id = orders.OrderId }, orders);
         }
 
@@ -85,21 +76,12 @@ namespace Northwind.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Orders>> DeleteOrders(int id)
         {
-            var orders = await _context.Orders.FindAsync(id);
-            if (orders == null)
-            {
-                return NotFound();
-            }
+            var entity = await _orderRepository.FindAsync(id);
+            await _orderRepository.DeleteAsync(id);
 
-            _context.Orders.Remove(orders);
-            await _context.SaveChangesAsync();
-
-            return orders;
+            return entity;
         }
 
-        private bool OrdersExists(int id)
-        {
-            return _context.Orders.Any(e => e.OrderId == id);
-        }
+
     }
 }

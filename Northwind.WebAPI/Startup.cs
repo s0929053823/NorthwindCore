@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Northwind.WebAPI.Repositorys;
+using Northwind.DbModels.Model;
 
 namespace Northwind.WebAPI
 {
@@ -30,6 +32,7 @@ namespace Northwind.WebAPI
        options.UseSqlServer(
            Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddTransient<IRepository<Orders>,EfRepository<Orders>> ();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
