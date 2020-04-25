@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EFCoreScaffoldModels.Model
+namespace Northwind.DbModels.Model
 {
-    public partial class Suppliers
+    public partial class Customers
     {
-        public Suppliers()
+        public Customers()
         {
-            Products = new HashSet<Products>();
+            CustomerCustomerDemo = new HashSet<CustomerCustomerDemo>();
+            Orders = new HashSet<Orders>();
         }
 
-        public int SupplierId { get; set; }
+        public string CustomerId { get; set; }
         public string CompanyName { get; set; }
         public string ContactName { get; set; }
         public string ContactTitle { get; set; }
@@ -21,8 +22,8 @@ namespace EFCoreScaffoldModels.Model
         public string Country { get; set; }
         public string Phone { get; set; }
         public string Fax { get; set; }
-        public string HomePage { get; set; }
 
-        public virtual ICollection<Products> Products { get; set; }
+        public virtual ICollection<CustomerCustomerDemo> CustomerCustomerDemo { get; set; }
+        public virtual ICollection<Orders> Orders { get; set; }
     }
 }

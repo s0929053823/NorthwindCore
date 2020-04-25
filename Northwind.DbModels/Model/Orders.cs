@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EFCoreScaffoldModels.Model
+namespace Northwind.DbModels.Model
 {
     public partial class Orders
     {
