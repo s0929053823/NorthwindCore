@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Northwind.DbModels.Model;
+using Northwind.WebAPI.Commnads;
 using Northwind.WebAPI.Repositorys;
 
 namespace Northwind.WebAPI.Controllers
@@ -14,18 +16,21 @@ namespace Northwind.WebAPI.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly IRepository<Orders> _orderRepository;
+        //     private readonly IRepository<Orders> _orderRepository;
+        private IMediator _mediator;
 
-        public OrdersController(IRepository<Orders> orderRepository)
+
+        public OrdersController(IMediator mediator)
         {
-            _orderRepository = orderRepository;
+            _mediator = mediator;
+            //_orderRepository = orderRepository;
         }
 
         // GET: api/Orders
         [HttpGet]
         public async Task<IEnumerable<Orders>> GetOrders()
         {
-            return await _orderRepository.GetAllAsync();
+            return await _mediator.Send(new GetOrderListQuery());
         }
 
 
@@ -33,28 +38,29 @@ namespace Northwind.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Orders>> GetOrders(int id)
         {
-            var orders = await _orderRepository.FindAsync(id);
+            var order = await _mediator.Send(new GetOrderDetailQuery { Id = id });
 
-            if (orders == null)
+            if (order == null)
             {
                 return NotFound();
             }
 
-            return orders;
+            return order;
         }
 
         //PUT: api/Orders/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrders(int id, [FromBody]Orders orders)
+        public async Task<IActionResult> PutOrders(int id, [FromBody]UpdateOrderCommand command)
         {
-            if (id != orders.OrderId)
+            if (id != command.OrderId)
             {
                 return BadRequest();
             }
 
             try
             {
-                await _orderRepository.UpdateAsync(orders);
+
+                await _mediator.Send(command);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -66,20 +72,24 @@ namespace Northwind.WebAPI.Controllers
 
         // POST: api/Orders
         [HttpPost]
-        public async Task<ActionResult<Orders>> PostOrders(Orders orders)
+        public async Task<ActionResult<Orders>> PostOrders([FromBody]CreateOrderCommand command)
         {
-            await _orderRepository.InsertAsync(orders);
-            return CreatedAtAction("GetOrders", new { id = orders.OrderId }, orders);
+
+            // await _orderRepository.InsertAsync(orders);
+            await _mediator.Send(command);
+            return NoContent();
+            //  return CreatedAtAction("GetOrders", new { id = newOrderId });
         }
 
         // DELETE: api/Orders/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Orders>> DeleteOrders(int id)
         {
-            var entity = await _orderRepository.FindAsync(id);
-            await _orderRepository.DeleteAsync(id);
+            var order = await _mediator.Send(new GetOrderDetailQuery { Id = id });
 
-            return entity;
+            await _mediator.Send(new DeleteOrderCommand { Id = id });
+
+            return order;
         }
 
 

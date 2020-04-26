@@ -13,6 +13,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Northwind.WebAPI.Repositorys;
 using Northwind.DbModels.Model;
+using AutoMapper;
+using MediatR;
+using System.Reflection;
 
 namespace Northwind.WebAPI
 {
@@ -28,10 +31,13 @@ namespace Northwind.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<DbModels.Model.NorthwindContext>(options =>
        options.UseSqlServer(
            Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(typeof(Startup));
             services.AddTransient<IRepository<Orders>,EfRepository<Orders>> ();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
